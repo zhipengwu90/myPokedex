@@ -108,7 +108,7 @@ const page = (props: Props) => {
     <>
       <Header />
       <form
-        className="fixed right-1 gap-2 mt-2 bg-white"
+        className="fixed right-1 gap-2 mt-12 bg-white"
         onSubmit={(e) => {
           e.preventDefault();
           handleSearch(search);
