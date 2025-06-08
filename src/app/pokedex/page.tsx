@@ -5,7 +5,8 @@ import Header from "../component/Header";
 import Pokedex from "./Pokedex";
 import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import SearchIcon from "@mui/icons-material/Search";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 type Props = {};
 
 interface Pokemon {
@@ -23,8 +24,9 @@ const page = (props: Props) => {
   const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState<Pokemon[] | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
   const loader = useRef<HTMLDivElement | null>(null);
-
+  const [isSearching, setIsSearching] = useState(false);
   const getPokemon = async (currentOffset = 0) => {
     setLoading(true);
     const response = await fetch(
@@ -85,6 +87,7 @@ const page = (props: Props) => {
       return;
     }
     setLoading(true);
+    setSearchResult(null);
     try {
       const res = await fetch(
         `https://pokeapi.co/api/v2/pokemon/${value.toLowerCase()}`
@@ -107,55 +110,88 @@ const page = (props: Props) => {
   return (
     <>
       <Header />
-      <form
-        className="fixed right-1 gap-2 mt-12 bg-white"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSearch(search);
-        }}
-      >
-        <div className="flex ">
-        <div className="relative w-64">
-          <input
-            type="text"
-            placeholder="Search Pokémon by name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onBlur={(e) => handleSearch(e.target.value)}
-            className="border rounded px-3 py-2 w-full pr-10"
-          />
-          {search && (
+      <div className="fixed right-1 mt-12 bg-white opacity-90 rounded z-10">
+        {!showSearch ? (
+          <IconButton
+            onClick={() => setShowSearch(true)}
+            aria-label="Show search"
+            className="m-2"
+          >
+            <SearchIcon fontSize="large" />
+          </IconButton>
+        ) : (
+          <form
+            className="flex items-center gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSearch(search);
+            }}
+          >
+            <div className="relative w-64">
+              <input
+                type="text"
+                placeholder="Search Pokémon by name"
+                value={search}
+                autoFocus
+                onChange={(e) => {
+                  setSearchResult(null);
+                  setSearch(e.target.value);
+                }}
+                // onBlur={(e) => {
+                //   handleSearch(e.target.value);
+
+                // }}
+                className="border rounded px-3 py-2 w-full pr-10"
+              />
+              {search && (
+                <IconButton
+                  size="small"
+                  className="!absolute right-1 top-1/2 -translate-y-1/2"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchResult(null);
+                  }}
+                  aria-label="Clear"
+                  tabIndex={-1}
+                >
+                  <DeleteForeverIcon fontSize="small" />
+                </IconButton>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Search
+            </button>
             <IconButton
-              size="small"
-              className="!absolute right-1 top-1/2 -translate-y-1/2"
               onClick={() => {
+                setShowSearch(false);
                 setSearch("");
                 setSearchResult(null);
               }}
-              aria-label="Clear"
+              aria-label="Close search"
+              className="ml-1"
+              tabIndex={-1}
             >
-              <ClearIcon fontSize="small" />
+              <ClearIcon />
             </IconButton>
-          )}
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Search
-        </button>
-        </div>
-      </form>
-      <Pokedex
-        pokemonList={searchResult !== null ? searchResult : pokemonList}
-      />
+          </form>
+        )}
+      </div>
+      {!loading && (
+        <Pokedex
+          pokemonList={searchResult !== null ? searchResult : pokemonList}
+        />
+      )}
       {searchResult !== null && searchResult.length === 0 && (
         <div className="text-center text-red-500 my-4">
           No Pokémon found for "{search}"
         </div>
       )}
       {!search && <div ref={loader} />}
-      {loading && <div className="text-center py-4">Loading...</div>}
+      {loading && <div className=" mt-20 text-center py-4">Loading...</div>}
+
       <Footer />
     </>
   );
