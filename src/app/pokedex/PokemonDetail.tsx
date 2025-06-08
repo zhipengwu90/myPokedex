@@ -108,7 +108,7 @@ const PokemonDetail = (props: Props) => {
       />
     );
   }
-  console.log( "pokemon", pokemon);
+  console.log("pokemon", pokemon);
   return (
     <div
       className={`relative mt-19  flex flex-col  items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto `}
@@ -135,7 +135,7 @@ const PokemonDetail = (props: Props) => {
         className="w-50 h-50 mt-20"
       />
 
-      {isPlaying ? (
+      {/* {isPlaying ? (
         <IconButton onClick={handlePause} aria-label="Pause cry">
           <PauseCircleIcon fontSize="large" color="error" />
         </IconButton>
@@ -143,23 +143,34 @@ const PokemonDetail = (props: Props) => {
         <IconButton onClick={handlePlay} aria-label="Play cry">
           <PlayCircleFilledIcon fontSize="large" color="error" />
         </IconButton>
-      )}
-      <audio
+      )} */}
+      {/* <audio
         ref={audioRef}
         className="hidden"
         key={pokemon.id || pokemon.name} // <-- force remount on pokemon change
       >
         <source src={pokemon.cries?.latest} type="audio/ogg" />
         Your browser does not support the audio element.
-      </audio>
-      <h2 className="text-3xl capitalize font-bold mb-2">{pokemon.name}</h2>
+      </audio> */}
       <AudioPlayerButton
         text={
-          `This is ${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}, a ${pokemon.types?.map((t: any) => t.type.name).join(" and ")} type Pokémon. ` +
-          `It stands ${pokemon.height / 10} meters tall and weighs ${pokemon.weight / 10} kilograms. ` +
-          `Its abilities are ${pokemon.abilities?.map((a: any) => a.ability.name).join(", ")}.`
+          `This is ${
+            pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)
+          }, a ${pokemon.types
+            ?.map((t: any) => t.type.name)
+            .join(" and ")} type Pokémon. ` +
+          `It stands ${pokemon.height / 10} meters tall and weighs ${
+            pokemon.weight / 10
+          } kilograms. ` +
+          `Its abilities are ${pokemon.abilities
+            ?.map((a: any) => a.ability.name)
+            .join(", ")}.` +
+          (pokemon.cries?.latest ? " Listen to its cry." : "")
         }
+        soundUrl={pokemon.cries?.latest}
       />
+      <h2 className="text-3xl capitalize font-bold mb-2">{pokemon.name}</h2>
+
       <div className="mb-2">
         <span className="font-semibold">Type: </span>
         {pokemon.types?.map((t: any) => (

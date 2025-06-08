@@ -6,22 +6,22 @@ import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 interface props {
   text: string;
   language?: string;
+  soundUrl: string;
 }
 
-const AudioPlayerButton = ({ text }: props) => {
+const AudioPlayerButton = ({ text, soundUrl }: props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const soundRef = useRef<HTMLAudioElement | null>(null);
 
   const handleAudio = async () => {
     if (!audioLoaded) {
-      setIsDisabled(true); // Disable only when fetching audio
+      setIsDisabled(true);
       const response = await fetch("/api/speedAPI", {
         method: "POST",
-        body: JSON.stringify({
-          text: text,
-        }),
+        body: JSON.stringify({ text }),
         headers: { "Content-Type": "application/json" },
       });
       const audioBlob = await response.blob();
@@ -30,22 +30,28 @@ const AudioPlayerButton = ({ text }: props) => {
       audioRef.current = audio;
       setAudioLoaded(true);
 
-      audio.onended = () => setIsPlaying(false);
+      audio.onended = () => {
+        setIsPlaying(false);
+        // Play the soundUrl audio after TTS finishes
+        if (soundUrl) {
+          const sound = new Audio(soundUrl);
+          soundRef.current = sound;
+          sound.play();
+        }
+      };
       audio.onpause = () => setIsPlaying(false);
 
       audio.play();
       setIsPlaying(true);
 
-      setTimeout(() => setIsDisabled(false), 1000); // Enable after 1 second
+      setTimeout(() => setIsDisabled(false), 1000);
     } else if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
-        // Do NOT disable here
       } else {
         audioRef.current.play();
         setIsPlaying(true);
-        // Do NOT disable here
       }
     }
   };
@@ -57,7 +63,11 @@ const AudioPlayerButton = ({ text }: props) => {
       audioRef.current = null;
       setIsPlaying(false);
     }
-  }, [text]);
+    if (soundRef.current) {
+      soundRef.current.pause();
+      soundRef.current = null;
+    }
+  }, [text, soundUrl]);
 
   return (
     <IconButton
@@ -67,7 +77,7 @@ const AudioPlayerButton = ({ text }: props) => {
       className="ml-2"
       disabled={isDisabled}
     >
-      {isPlaying ? <PauseCircleIcon /> : <PlayCircleIcon />}
+      {isPlaying ? <PauseCircleIcon fontSize="large" color="error"/> : <PlayCircleIcon fontSize="large" color="error"/>}
     </IconButton>
   );
 };
