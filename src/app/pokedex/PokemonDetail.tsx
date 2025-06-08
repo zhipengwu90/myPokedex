@@ -88,7 +88,7 @@ const PokemonDetail = (props: Props) => {
 
   return (
     <div
-      className={`relative flex flex-col items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto`}
+      className={`relative flex flex-col items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto  pt-12`}
     >
       {/* Close Button */}
       <IconButton
@@ -110,11 +110,15 @@ const PokemonDetail = (props: Props) => {
         alt={pokemon.name}
         className="w-50 h-50"
       />
-
+      
       <IconButton onClick={handlePlay} aria-label="Play cry">
         <PlayCircleFilledIcon fontSize="large" color="error" />
       </IconButton>
-      <audio ref={audioRef}>
+      <audio
+        ref={audioRef}
+        className="hidden"
+        key={pokemon.id || pokemon.name} // <-- force remount on pokemon change
+      >
         <source src={pokemon.cries?.latest} type="audio/ogg" />
         Your browser does not support the audio element.
       </audio>
@@ -138,8 +142,11 @@ const PokemonDetail = (props: Props) => {
         <span className="font-semibold">Height:</span> {pokemon.height}
         <span className="ml-4 font-semibold">Weight:</span> {pokemon.weight}
       </div>
-      <div className="mb-2">
-        <span className="font-semibold">Abilities:</span>{" "}
+      <div className="mb-2 ">
+        <div className="font-semibold">Abilities:</div>
+      </div>
+
+      <div className="mb-2 ">
         {pokemon.abilities?.map((a: any) => (
           <span
             key={a.ability.name}
@@ -149,10 +156,10 @@ const PokemonDetail = (props: Props) => {
           </span>
         ))}
       </div>
-      {evolutionDetails.length > 0 && (
-        <div className="mb-2">
-          <span className="font-semibold">Evolution Chain:</span>
-          <div className="flex flex-wrap gap-4 mt-2">
+      <div className="font-semibold">Evolution Chain:</div>
+      {evolutionDetails.length > 0 ? (
+        <div className="mb-2  ">
+          <div className="flex flex-wrap gap-4 mt-2 justify-center">
             {evolutionDetails.map((evo) => (
               <div
                 key={evo.id}
@@ -174,6 +181,8 @@ const PokemonDetail = (props: Props) => {
             ))}
           </div>
         </div>
+      ) : (
+        <div className="text-gray-500">No evolutions found</div>
       )}
     </div>
   );

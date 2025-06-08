@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CircularProgress from "@mui/material/CircularProgress";
 type Props = {};
 
 interface Pokemon {
@@ -37,6 +38,7 @@ const page = (props: Props) => {
       data.results.map(async (pokemon: { name: string; url: string }) => {
         const res = await fetch(pokemon.url);
         const details = await res.json();
+        
         return {
           name: details.name,
           image: details.sprites.front_default,
@@ -44,16 +46,25 @@ const page = (props: Props) => {
         };
       })
     );
-    setPokemonList((prev) => [...prev, ...newPokemonList]);
+    setPokemonList((prev) => {
+      const existingIds = new Set(prev.map((p) => p.id));
+      const filtered = newPokemonList.filter((p) => !existingIds.has(p.id));
+      return [...prev, ...filtered];
+    });
     setHasMore(Boolean(data.next));
     setLoading(false);
   };
 
   // Initial load
   useEffect(() => {
-    getPokemon(0);
-    setOffset(PAGE_LIMIT);
+    if (pokemonList.length === 0) {
+      getPokemon(0);
+      setOffset(PAGE_LIMIT);
+    }
+    // eslint-disable-next-line
   }, []);
+
+  console.log("pokemonList", pokemonList);
 
   // Infinite scroll observer
   const handleObserver = useCallback(
@@ -86,7 +97,7 @@ const page = (props: Props) => {
       setSearchResult(null);
       return;
     }
-    setLoading(true);
+    setIsSearching(true);
     setSearchResult(null);
     try {
       const res = await fetch(
@@ -104,12 +115,17 @@ const page = (props: Props) => {
     } catch {
       setSearchResult([]);
     }
-    setLoading(false);
+    setIsSearching(false);
   };
 
   return (
     <>
       <Header />
+      {isSearching && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-white/60">
+          <CircularProgress />
+        </div>
+      )}
       <div className="fixed right-1 mt-12 bg-white opacity-90 rounded z-10">
         {!showSearch ? (
           <IconButton
@@ -179,19 +195,23 @@ const page = (props: Props) => {
           </form>
         )}
       </div>
-      {!loading && (
-        <Pokedex
-          pokemonList={searchResult !== null ? searchResult : pokemonList}
-        />
-      )}
+      (
+      <Pokedex
+        pokemonList={searchResult !== null ? searchResult : pokemonList}
+      />
+      )
       {searchResult !== null && searchResult.length === 0 && (
         <div className="text-center text-red-500 my-4">
           No Pokémon found for "{search}"
         </div>
       )}
       {!search && <div ref={loader} />}
-      {loading && <div className=" mt-20 text-center py-4">Loading...</div>}
-
+      {loading && (
+        <div className="mt-3 text-center py-4">
+          <CircularProgress />
+          <div className="ml-2">Loading more Pokémon...</div>
+        </div>
+      )}
       <Footer />
     </>
   );

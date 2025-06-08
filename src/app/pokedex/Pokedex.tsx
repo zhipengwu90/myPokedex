@@ -17,6 +17,8 @@ const Pokedex = (props: Props) => {
 
   const handleSelectPokemon = (pokemon: any) => setSelectedPokemon(pokemon);
 
+
+
   return (
     <div className="mt-12 p-4">
       {/* Show PokemonDetail window if a pokemon is selected */}
@@ -39,7 +41,7 @@ const Pokedex = (props: Props) => {
       <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-6 mt-8">
         {pokemonList.map((pokemon) => (
           <div
-            key={pokemon.name}
+            key={ `${pokemon.name}-${pokemon.id}`}
             className="flex flex-col items-center bg-white rounded-lg shadow p-4
             hover:shadow-lg transition-shadow duration-300
             cursor-pointer
