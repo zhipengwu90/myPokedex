@@ -2,7 +2,9 @@ import React, { useRef, useEffect, useState } from "react";
 import { IconButton } from "@mui/material";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
+import PauseCircleIcon from "@mui/icons-material/PauseCircle";
 
+import AudioPlayerButton from "./AudioPlayerButton"; // Adjust the import path as needed
 type Props = {
   className?: string;
   pokemon: any;
@@ -17,10 +19,31 @@ const PokemonDetail = (props: Props) => {
   const [evolutionChain, setEvolutionChain] = useState<any>(null);
   const [evolutionDetails, setEvolutionDetails] = useState<any[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<any | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
+  // Play and pause handlers
   const handlePlay = () => {
     audioRef.current?.play();
   };
+  const handlePause = () => {
+    audioRef.current?.pause();
+  };
+
+  // Listen for play/pause events
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("ended", onPause);
+    return () => {
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("ended", onPause);
+    };
+  }, [pokemon.id]);
 
   // Helper function to recursively collect all species names in the chain
   const getAllEvolutions = (chain: any, arr: any[] = []) => {
@@ -85,7 +108,7 @@ const PokemonDetail = (props: Props) => {
       />
     );
   }
-
+  console.log( "pokemon", pokemon);
   return (
     <div
       className={`relative mt-19  flex flex-col  items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto `}
@@ -112,9 +135,15 @@ const PokemonDetail = (props: Props) => {
         className="w-50 h-50 mt-20"
       />
 
-      <IconButton onClick={handlePlay} aria-label="Play cry">
-        <PlayCircleFilledIcon fontSize="large" color="error" />
-      </IconButton>
+      {isPlaying ? (
+        <IconButton onClick={handlePause} aria-label="Pause cry">
+          <PauseCircleIcon fontSize="large" color="error" />
+        </IconButton>
+      ) : (
+        <IconButton onClick={handlePlay} aria-label="Play cry">
+          <PlayCircleFilledIcon fontSize="large" color="error" />
+        </IconButton>
+      )}
       <audio
         ref={audioRef}
         className="hidden"
@@ -124,6 +153,13 @@ const PokemonDetail = (props: Props) => {
         Your browser does not support the audio element.
       </audio>
       <h2 className="text-3xl capitalize font-bold mb-2">{pokemon.name}</h2>
+      <AudioPlayerButton
+        text={
+          `This is ${pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}, a ${pokemon.types?.map((t: any) => t.type.name).join(" and ")} type Pokémon. ` +
+          `It stands ${pokemon.height / 10} meters tall and weighs ${pokemon.weight / 10} kilograms. ` +
+          `Its abilities are ${pokemon.abilities?.map((a: any) => a.ability.name).join(", ")}.`
+        }
+      />
       <div className="mb-2">
         <span className="font-semibold">Type: </span>
         {pokemon.types?.map((t: any) => (
@@ -135,10 +171,10 @@ const PokemonDetail = (props: Props) => {
           </span>
         ))}
       </div>
-      <div className="mb-2">
+      {/* <div className="mb-2">
         <span className="font-semibold">Base Experience:</span>{" "}
         {pokemon.base_experience}
-      </div>
+      </div> */}
       <div className="mb-2">
         <span className="font-semibold">Height:</span> {pokemon.height}
         <span className="ml-4 font-semibold">Weight:</span> {pokemon.weight}
