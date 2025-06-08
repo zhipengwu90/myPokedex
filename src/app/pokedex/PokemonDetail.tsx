@@ -88,7 +88,7 @@ const PokemonDetail = (props: Props) => {
 
   return (
     <div
-      className={`relative flex flex-col items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto  pt-12`}
+      className={`relative mt-19  flex flex-col  items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto `}
     >
       {/* Close Button */}
       <IconButton
@@ -105,12 +105,13 @@ const PokemonDetail = (props: Props) => {
         <HighlightOffIcon sx={{ fontSize: 48 }} />
       </IconButton>
       {/* Pokemon Image and Name */}
+
       <img
         src={pokemon.image || pokemon.sprites?.front_default}
         alt={pokemon.name}
-        className="w-50 h-50"
+        className="w-50 h-50 mt-20"
       />
-      
+
       <IconButton onClick={handlePlay} aria-label="Play cry">
         <PlayCircleFilledIcon fontSize="large" color="error" />
       </IconButton>

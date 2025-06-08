@@ -24,7 +24,7 @@ const Pokedex = (props: Props) => {
       {/* Show PokemonDetail window if a pokemon is selected */}
       {selectedPokemon && (
         <>
-          <div className="fixed bottom-0 left-0 w-full  z-20 h-[92%]  shadow-lg ">
+          <div className="fixed top-0  left-0 w-full  z-20 h-[92%]  shadow-lg ">
             <PokemonDetail
               pokemon={selectedPokemon}
               onClose={handleClose}

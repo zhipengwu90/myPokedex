@@ -143,7 +143,7 @@ const page = (props: Props) => {
               handleSearch(search);
             }}
           >
-            <div className="relative w-64">
+            <div className="relative w-50">
               <input
                 type="text"
                 placeholder="Search Pokémon by name"
