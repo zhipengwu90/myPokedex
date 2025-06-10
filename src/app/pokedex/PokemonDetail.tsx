@@ -14,36 +14,37 @@ type Props = {
 
 const PokemonDetail = (props: Props) => {
   const { className, pokemon, onClose } = props;
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioPlayerRef = useRef<any>(null);
 
   const [evolutionChain, setEvolutionChain] = useState<any>(null);
   const [evolutionDetails, setEvolutionDetails] = useState<any[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<any | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioStopped, setAudioStopped] = useState(false);
 
-  // Play and pause handlers
-  const handlePlay = () => {
-    audioRef.current?.play();
-  };
-  const handlePause = () => {
-    audioRef.current?.pause();
-  };
+  // // Play and pause handlers
+  // const handlePlay = () => {
+  //   audioRef.current?.play();
+  // };
+  // const handlePause = () => {
+  //   audioRef.current?.pause();
+  // };
 
   // Listen for play/pause events
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
-    audio.addEventListener("play", onPlay);
-    audio.addEventListener("pause", onPause);
-    audio.addEventListener("ended", onPause);
-    return () => {
-      audio.removeEventListener("play", onPlay);
-      audio.removeEventListener("pause", onPause);
-      audio.removeEventListener("ended", onPause);
-    };
-  }, [pokemon.id]);
+  // useEffect(() => {
+  //   const audio = audioRef.current;
+  //   if (!audio) return;
+  //   const onPlay = () => setIsPlaying(true);
+  //   const onPause = () => setIsPlaying(false);
+  //   audio.addEventListener("play", onPlay);
+  //   audio.addEventListener("pause", onPause);
+  //   audio.addEventListener("ended", onPause);
+  //   return () => {
+  //     audio.removeEventListener("play", onPlay);
+  //     audio.removeEventListener("pause", onPause);
+  //     audio.removeEventListener("ended", onPause);
+  //   };
+  // }, [pokemon.id]);
 
   // Helper function to recursively collect all species names in the chain
   const getAllEvolutions = (chain: any, arr: any[] = []) => {
@@ -99,6 +100,10 @@ const PokemonDetail = (props: Props) => {
     setSelectedPokemon(null); // Reset if parent changes
   }, [pokemon]);
 
+  // useEffect(() => {
+  //   setAudioStopped(false);
+  // }, [pokemon]);
+
   // If a Pokémon in the chain is clicked, show its detail in a new window
   if (selectedPokemon) {
     return (
@@ -108,7 +113,7 @@ const PokemonDetail = (props: Props) => {
       />
     );
   }
-  console.log("pokemon", pokemon);
+
   return (
     <div
       className={`relative mt-19  flex flex-col  items-center justify-center h-full p-4 bg-white rounded-lg shadow-lg max-w-lg mx-auto overflow-y-auto `}
@@ -122,7 +127,12 @@ const PokemonDetail = (props: Props) => {
           color: "black",
           fontSize: 48,
         }}
-        onClick={onClose}
+        onClick={() => {
+          if (audioPlayerRef.current && audioPlayerRef.current.stopAudio) {
+            audioPlayerRef.current.stopAudio();
+          } // Call audio handler if needed
+          onClose();
+        }}
         size="large"
       >
         <HighlightOffIcon sx={{ fontSize: 48 }} />
@@ -153,6 +163,7 @@ const PokemonDetail = (props: Props) => {
         Your browser does not support the audio element.
       </audio> */}
       <AudioPlayerButton
+        ref={audioPlayerRef}
         text={
           `This is ${
             pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)

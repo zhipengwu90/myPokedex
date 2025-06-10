@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
+
 import IconButton from "@mui/material/IconButton";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import PauseCircleIcon from "@mui/icons-material/PauseCircle";
@@ -8,8 +9,7 @@ interface props {
   language?: string;
   soundUrl: string;
 }
-
-const AudioPlayerButton = ({ text, soundUrl }: props) => {
+const AudioPlayerButton = forwardRef(({ text, soundUrl }: props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioLoaded, setAudioLoaded] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -19,6 +19,7 @@ const AudioPlayerButton = ({ text, soundUrl }: props) => {
   const handleAudio = async () => {
     if (!audioLoaded) {
       setIsDisabled(true);
+      setIsPlaying(true); // <-- Show PauseCircleIcon immediately
       const response = await fetch("/api/speedAPI", {
         method: "POST",
         body: JSON.stringify({ text }),
@@ -42,21 +43,20 @@ const AudioPlayerButton = ({ text, soundUrl }: props) => {
       audio.onpause = () => setIsPlaying(false);
 
       audio.play();
-      setIsPlaying(true);
-
       setTimeout(() => setIsDisabled(false), 1000);
     } else if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
       } else {
+        setIsPlaying(true); // <-- Show PauseCircleIcon immediately
         audioRef.current.play();
-        setIsPlaying(true);
       }
     }
   };
 
   useEffect(() => {
+    console.log(soundUrl);
     setAudioLoaded(false);
     if (audioRef.current) {
       audioRef.current.pause();
@@ -69,6 +69,22 @@ const AudioPlayerButton = ({ text, soundUrl }: props) => {
     }
   }, [text, soundUrl]);
 
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    if (soundRef.current) {
+      soundRef.current.pause();
+    }
+    setIsPlaying(false);
+    setAudioLoaded(false);
+    setIsDisabled(false);
+  };
+
+  useImperativeHandle(ref, () => ({
+    stopAudio,
+  }));
+
   return (
     <IconButton
       color="primary"
@@ -77,9 +93,13 @@ const AudioPlayerButton = ({ text, soundUrl }: props) => {
       className="ml-2"
       disabled={isDisabled}
     >
-      {isPlaying ? <PauseCircleIcon fontSize="large" color="error"/> : <PlayCircleIcon fontSize="large" color="error"/>}
+      {isPlaying ? (
+        <PauseCircleIcon fontSize="large" color="error" />
+      ) : (
+        <PlayCircleIcon fontSize="large" color="error" />
+      )}
     </IconButton>
   );
-};
+});
 
 export default AudioPlayerButton;

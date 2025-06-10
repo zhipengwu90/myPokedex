@@ -64,7 +64,6 @@ const page = (props: Props) => {
     // eslint-disable-next-line
   }, []);
 
-  console.log("pokemonList", pokemonList);
 
   // Infinite scroll observer
   const handleObserver = useCallback(
