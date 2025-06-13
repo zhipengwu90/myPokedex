@@ -6,13 +6,13 @@ import Header from "../component/Header";
 import Footer from "../component/Footer";
 
 interface HomePageProps {
-  password: string;
+
 }
 
-const HomePage: React.FC<HomePageProps> = ({ password }) => {
-  const [passwordInput, setPasswordInput] = useState<string>("");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [passwordError, setPasswordError] = useState<string>("");
+const HomePage: React.FC<HomePageProps> = ({  }) => {
+  // const [passwordInput, setPasswordInput] = useState<string>("");
+  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // const [passwordError, setPasswordError] = useState<string>("");
 
   // const handlePasswordSubmit = (e: FormEvent<HTMLFormElement>) => {
   //   e.preventDefault();

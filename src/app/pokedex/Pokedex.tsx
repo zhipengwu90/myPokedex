@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PokemonDetail from "./PokemonDetail";
 
 type Props = {
+  className?: string;
   pokemonList: {
     name: string;
     image: string;
@@ -20,7 +21,7 @@ const Pokedex = (props: Props) => {
 
 
   return (
-    <div className="mt-12 p-4">
+    <div className={`mt-12 p-4 ${props.className}`}>
       {/* Show PokemonDetail window if a pokemon is selected */}
       {selectedPokemon && (
         <>
