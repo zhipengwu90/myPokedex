@@ -185,7 +185,7 @@ const page = (props: Props) => {
               </>
             ) : (
               <>
-                <Pokedex pokemonList={pokemonData} className="text-black" />
+                <Pokedex pokemonList={pokemonData} className="text-black mb-20" />
               </>
             )}
           </div>
