@@ -1,7 +1,6 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { useEffect, useRef, useState } from "react";
 import Header from "../component/Header";
 import PhotoFooter from "../component/PhotoFooter";
 import Webcam from "react-webcam";
@@ -22,6 +21,15 @@ const page = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isApokemon, setIsApokemon] = useState(false);
+  const pokedexRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll to Pokedex when pokemonData is set
+  useEffect(() => {
+    if (pokemonData.length > 0 && pokedexRef.current) {
+      pokedexRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [pokemonData]);
+
   const takeScreenshot = async () => {
     play();
     if (webcamRef.current) {
@@ -185,7 +193,9 @@ const page = (props: Props) => {
               </>
             ) : (
               <>
-                <Pokedex pokemonList={pokemonData} className="text-black mb-20" />
+                <div ref={pokedexRef}>
+                  <Pokedex pokemonList={pokemonData} className="text-black mb-20" />
+                </div>
               </>
             )}
           </div>
